@@ -1,0 +1,14 @@
+body {
+  height: 100%;
+  font-smooth: always;
+}
+
+.semi-bold {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.normal {
+  font-weight: 400;
+  font-size: 12px;
+}

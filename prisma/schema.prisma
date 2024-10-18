@@ -1,0 +1,42 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Family {
+  id       String  @id @default(uuid())
+  name     String
+  rootId   String  @unique
+  root     Person  @relation("FamilyRoot", fields: [rootId], references: [id])
+  members  Person[]
+}
+
+model Person {
+  id         String   @id @default(uuid())
+  name       String
+  gender     String
+  dob        DateTime
+  alive      Boolean
+  
+  // Self-referential relationships
+  parentId   String?
+  parent     Person?  @relation("ParentChildren", fields: [parentId], references: [id])
+  children   Person[] @relation("ParentChildren")
+  
+  // Spouse relationship
+  spouseId   String?  @unique
+  spouse     Person?  @relation("Spouses", fields: [spouseId], references: [id])
+  spousedTo  Person?  @relation("Spouses")
+
+  // Family relationships
+  family     Family?  @relation(fields: [familyId], references: [id])
+  familyId   String?
+  rootFamily Family?  @relation("FamilyRoot")
+
+  // Attributes
+  attributes Json?
+}

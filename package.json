@@ -1,0 +1,29 @@
+{
+  "name": "family-tree",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.21.0",
+    "@visx/shape": "^3.5.0",
+    "next": "14.2.15",
+    "next-auth": "^4.24.8",
+    "prisma": "^5.21.0",
+    "react": "^18",
+    "react-d3-tree": "^3.6.2",
+    "react-dom": "^18"
+  },
+  "devDependencies": {
+    "@types/node": "22.7.6",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.15"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  }
+}
