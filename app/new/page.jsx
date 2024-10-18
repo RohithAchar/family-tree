@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
 import { createNewFamily } from "@/action/create-family";
 
 const CreateFamilyPage = () => {
@@ -29,7 +28,7 @@ const CreateFamilyPage = () => {
       setMessage(
         `Family '${newFamily.name}' created successfully with root person '${newFamily.root.name}'!`
       );
-      router.push(`/${newFamily.id}`);
+      router.push(`family/${newFamily.id}`);
     } catch (error) {
       setMessage("Error creating family: " + error.message);
     }
