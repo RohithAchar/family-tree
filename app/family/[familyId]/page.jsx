@@ -5,9 +5,9 @@ import Tree from "react-d3-tree";
 
 import CustomNode from "./components/custome-node";
 import CurvyLink from "./components/curvy-line";
-import { getFamilyMembers } from "@/action/get-family";
+import { getFamilyMembers } from "@/lib/action/get-family";
 import { useParams, useRouter } from "next/navigation";
-import { getCreator } from "@/action/get-creator";
+import { getCreator } from "@/lib/action/get-creator";
 
 export default function App() {
   const [treeData, setTreeData] = useState();

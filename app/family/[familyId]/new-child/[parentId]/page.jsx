@@ -2,10 +2,12 @@
 
 import { useParams, useRouter } from "next/navigation";
 
-import { createChild } from "@/action/create-child";
+import { createChild } from "@/lib/action/create-child";
 // pages/addChild.js
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { signIn, useSession } from "next-auth/react";
+import { getCreator } from "@/lib/action/get-creator";
 
 const AddChildPage = () => {
   const [formData, setFormData] = useState({
@@ -17,6 +19,22 @@ const AddChildPage = () => {
   const [message, setMessage] = useState("");
   const params = useParams();
   const router = useRouter();
+  const { data, status } = useSession();
+  const [creatorId, setCreatorId] = useState(null);
+
+  if (status === "unauthenticated") {
+    alert("Please login to continue");
+    signIn();
+  }
+
+  async function fetchCreator() {
+    const creatorId = await getCreator(params.familyId);
+    setCreatorId(creatorId);
+  }
+
+  useEffect(() => {
+    fetchCreator();
+  }, [status]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,11 +44,18 @@ const AddChildPage = () => {
       console.log(parentId);
       const newChild = await createChild(parentId, formData);
       setMessage(`Child ${newChild.name} created successfully!`);
-      router.back();
+      router.push(`/family/${params.familyId}`);
     } catch (error) {
       setMessage("Error creating child: " + error.message);
     }
   };
+
+  useEffect(() => {
+    if (data && data.user.email !== creatorId) {
+      alert("Unauthorized");
+      router.push(`/family/${params.familyId}`);
+    }
+  }, [creatorId]);
 
   return (
     <div>

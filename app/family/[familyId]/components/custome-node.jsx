@@ -15,11 +15,7 @@ const CustomNode = ({ nodeDatum, toggleNode }) => {
   };
 
   return (
-    <g
-      onClick={() => {
-        handleNodeClick(nodeDatum.id);
-      }}
-    >
+    <g>
       <rect
         className="node"
         width="200"
@@ -30,6 +26,9 @@ const CustomNode = ({ nodeDatum, toggleNode }) => {
         ry="16"
         stroke="none"
         fill={nodeDatum.attributes?.gender === "male" ? "#E9EAFD" : "#FDE9F9"}
+        onClick={() => {
+          handleNodeClick(nodeDatum.id);
+        }}
       />
       <text
         className="semi-bold"

@@ -1,9 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
-import { addSpouse } from "@/action/create-spouse"; // The addSpouse function we created earlier
+import { addSpouse } from "@/lib/action/create-spouse"; // The addSpouse function we created earlier
+import { useSession } from "next-auth/react";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { getCreator } from "@/lib/action/get-creator";
 
 const AddSpouseForm = () => {
   const [spouseData, setSpouseData] = useState({
@@ -16,6 +19,29 @@ const AddSpouseForm = () => {
   const [message, setMessage] = useState("");
   const params = useParams();
   const router = useRouter();
+  const { data, status } = useSession();
+  const [creatorId, setCreatorId] = useState(null);
+
+  if (status === "unauthenticated") {
+    alert("Please login to continue");
+    signIn();
+  }
+
+  async function fetchCreator() {
+    const creatorId = await getCreator(params.familyId);
+    setCreatorId(creatorId);
+  }
+
+  useEffect(() => {
+    fetchCreator();
+  }, [status]);
+
+  useEffect(() => {
+    if (data && data.user.email !== creatorId) {
+      alert("Unauthorized");
+      router.push(`/family/${params.familyId}`);
+    }
+  }, [creatorId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,7 +51,7 @@ const AddSpouseForm = () => {
       console.log("personId: " + personId);
       const result = await addSpouse(personId, spouseData);
       setMessage(`Spouse added successfully!`);
-      router.back();
+      router.push(`/family/${params.familyId}`);
     } catch (error) {
       setMessage(`Error adding spouse: ${error.message}`);
     }

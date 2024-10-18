@@ -1,10 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createNewFamily } from "@/action/create-family";
+import { createNewFamily } from "@/lib/action/create-family";
+import { signIn, useSession } from "next-auth/react";
+import { authOptions } from "../api/auth/[...nextauth]/route";
 
 const CreateFamilyPage = () => {
+  const { data, status } = useSession(authOptions);
   const [formData, setFormData] = useState({
     familyName: "",
     rootPerson: {
@@ -17,9 +20,17 @@ const CreateFamilyPage = () => {
   const [message, setMessage] = useState("");
   const router = useRouter();
 
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      console.log(data);
+      signIn();
+    }
+  }, [status]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const creatorId = "123";
+    const creatorId = data.user.email;
+    console.log(creatorId);
 
     try {
       const newFamily = await createNewFamily(
