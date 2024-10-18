@@ -1,15 +1,15 @@
-"use server";
-
 // utils/createFamily.js
+"use server";
 
 import prisma from "@/db/prisma"; // Ensure Prisma client is initialized
 
-export async function createNewFamily(familyName, rootPersonData) {
+export async function createNewFamily(familyName, rootPersonData, creatorId) {
   try {
     // Create the new family and the root person in a single transaction
     const newFamily = await prisma.family.create({
       data: {
         name: familyName,
+        creatorId: creatorId, // Store the creatorId
         root: {
           create: {
             name: rootPersonData.name,

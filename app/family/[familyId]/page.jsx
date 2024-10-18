@@ -7,10 +7,12 @@ import CustomNode from "./components/custome-node";
 import CurvyLink from "./components/curvy-line";
 import { getFamilyMembers } from "@/action/get-family";
 import { useParams, useRouter } from "next/navigation";
+import { getCreator } from "@/action/get-creator";
 
 export default function App() {
   const [treeData, setTreeData] = useState();
   const [isMounted, setIsMounted] = useState(false);
+  const [creator, setCreator] = useState(null);
   const [error, setError] = useState(null);
   const params = useParams();
 
@@ -23,6 +25,8 @@ export default function App() {
       const familyId = params.familyId; // Replace with your actual family ID
       try {
         const data = await getFamilyMembers(familyId);
+        const creatorId = await getCreator(familyId);
+        setCreator(creatorId);
         setTreeData(data);
       } catch (err) {
         setError(err.message);
@@ -54,5 +58,10 @@ export default function App() {
     return <button onClick={() => handleAddChild()}>Add Root</button>;
   }
 
-  return <FamilyTree data={treeData} />;
+  return (
+    <>
+      <div>Creator: {creator}</div>
+      <FamilyTree data={treeData} />
+    </>
+  );
 }

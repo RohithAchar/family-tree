@@ -7,6 +7,7 @@ async function main() {
   const acharFamily = await prisma.family.create({
     data: {
       name: "Achar",
+      creatorId: "123",
       root: {
         create: {
           name: "Root",

@@ -9,11 +9,15 @@ const CustomNode = ({ nodeDatum, toggleNode }) => {
     const currentPath = window.location.href;
     window.location.href = `${currentPath}/new-spouse/${partnerId}`;
   };
+  const handleNodeClick = (id) => {
+    const currentPath = window.location.href;
+    window.location.href = `${currentPath}/${id}`;
+  };
 
   return (
     <g
       onClick={() => {
-        console.log(nodeDatum);
+        handleNodeClick(nodeDatum.id);
       }}
     >
       <rect

@@ -19,11 +19,13 @@ const CreateFamilyPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const creatorId = "123";
 
     try {
       const newFamily = await createNewFamily(
         formData.familyName,
-        formData.rootPerson
+        formData.rootPerson,
+        creatorId
       );
       setMessage(
         `Family '${newFamily.name}' created successfully with root person '${newFamily.root.name}'!`

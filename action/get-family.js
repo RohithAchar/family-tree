@@ -19,8 +19,8 @@ async function getFamilyTree(personId) {
 
   // Format the person data with the required attributes
   const formattedPerson = {
-    name: person.name,
     id: person.id,
+    name: person.name,
     attributes: {
       gender: person.gender,
       dob: person.dob.toISOString().split("T")[0], // Format date to YYYY-MM-DD
