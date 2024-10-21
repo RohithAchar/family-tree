@@ -16,6 +16,19 @@ const CustomNode = ({ nodeDatum, toggleNode }) => {
 
   return (
     <g>
+      {/* Define the shadow filter */}
+      <defs>
+        <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow
+            dx="4"
+            dy="4"
+            stdDeviation="4"
+            floodColor="rgba(0, 0, 0, 0.1)"
+          />
+        </filter>
+      </defs>
+
+      {/* Apply the shadow filter to the rect */}
       <rect
         className="node"
         width="200"
@@ -26,10 +39,12 @@ const CustomNode = ({ nodeDatum, toggleNode }) => {
         ry="16"
         stroke="none"
         fill={nodeDatum.attributes?.gender === "male" ? "#E9EAFD" : "#FDE9F9"}
+        filter="url(#shadow)" // Apply the shadow filter
         onClick={() => {
           handleNodeClick(nodeDatum.id);
         }}
       />
+
       <text className="semi-bold" fill="black" strokeWidth="0.4" x="-80" y="5">
         {nodeDatum.name}
       </text>
@@ -53,12 +68,13 @@ const CustomNode = ({ nodeDatum, toggleNode }) => {
           </clipPath>
         </defs>
         <image
-          href="/spiderman.jpeg"
+          href={nodeDatum.attributes?.url}
           x="0"
           y="0"
           width="52"
           height="52"
-          clip-path="url(#circle-clip)"
+          opacity="0.9"
+          clipPath="url(#circle-clip)"
         />
       </svg>
 
@@ -89,6 +105,19 @@ const CustomNode = ({ nodeDatum, toggleNode }) => {
       {/* Render spouse if exists */}
       {nodeDatum.spouse && (
         <g>
+          {/* Define the shadow filter if it's not already defined */}
+          <defs>
+            <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow
+                dx="4"
+                dy="4"
+                stdDeviation="4"
+                floodColor="rgba(0, 0, 0, 0.1)"
+              />
+            </filter>
+          </defs>
+
+          {/* Apply the shadow filter to this rect as well */}
           <rect
             width="200"
             height="80"
@@ -102,6 +131,7 @@ const CustomNode = ({ nodeDatum, toggleNode }) => {
                 ? "#E9EAFD"
                 : "#FDE9F9"
             }
+            filter="url(#shadow)" // Apply the shadow filter here
           />
           <text
             className="semi-bold"
@@ -148,12 +178,13 @@ const CustomNode = ({ nodeDatum, toggleNode }) => {
             </clipPath>
           </defs>
           <image
-            href="/spiderman.jpeg"
+            href={nodeDatum.spouse.attributes?.url}
             x="0"
             y="0"
             width="52"
             height="52"
-            clip-path="url(#circle-clip)"
+            opacity="0.9"
+            clipPath="url(#circle-clip)"
           />
         </svg>
       )}

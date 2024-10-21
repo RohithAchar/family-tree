@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { createNewFamily } from "@/lib/action/create-family";
 import { signIn, useSession } from "next-auth/react";
 import { authOptions } from "../api/auth/[...nextauth]/route";
+import { CldUploadWidget } from "next-cloudinary";
+import Image from "next/image";
 
 const CreateFamilyPage = () => {
   const { data, status } = useSession(authOptions);
@@ -15,6 +17,7 @@ const CreateFamilyPage = () => {
       gender: "male", // Default value for gender
       dob: "",
       alive: true,
+      url: "",
     },
   });
   const [message, setMessage] = useState("");
@@ -47,9 +50,32 @@ const CreateFamilyPage = () => {
     }
   };
 
+  const onUpload = (e) => {
+    console.log("onUpload: ", e.info.secure_url);
+    setFormData((prev) => ({
+      ...prev,
+      rootPerson: { ...prev.rootPerson, url: e.info.secure_url },
+    }));
+  };
+
   return (
     <div>
       <h1>Create New Family</h1>
+      <CldUploadWidget uploadPreset="u9zu1wyh" onSuccess={onUpload}>
+        {({ open }) => {
+          return <button onClick={() => open()}>Upload an Image</button>;
+        }}
+      </CldUploadWidget>
+      {formData.rootPerson.url && (
+        <Image
+          src={formData.rootPerson.url}
+          alt="Profile"
+          x="0"
+          y="0"
+          width="52"
+          height="52"
+        />
+      )}
       <form onSubmit={handleSubmit}>
         <div>
           <label>Family Name</label>

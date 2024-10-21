@@ -22,6 +22,7 @@ model Person {
   gender     String
   dob        DateTime
   alive      Boolean
+  url        String
   
   // Self-referential relationships
   parentId   String?

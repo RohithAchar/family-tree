@@ -45,7 +45,7 @@ export default function App() {
           pathFunc="step"
           renderCustomNodeElement={CustomNode}
           linkComponent={CurvyLink}
-          separation={{ siblings: 3.5, nonSiblings: 2 }}
+          separation={{ siblings: 3.5, nonSiblings: 3 }}
           translate={{ x: window.innerWidth / 2, y: 200 }}
         />
       </div>
@@ -60,7 +60,7 @@ export default function App() {
 
   return (
     <>
-      <div>Creator: {creator}</div>
+      <div>Hello</div>
       <FamilyTree data={treeData} />
     </>
   );
