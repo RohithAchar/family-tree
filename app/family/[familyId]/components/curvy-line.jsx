@@ -5,7 +5,7 @@ const CurvyLink = ({ linkData }) => (
     data={linkData}
     fill="none"
     stroke="#000"
-    strokeWidth="0.1"
+    strokeWidth="1"
     className="custom-link"
   />
 );

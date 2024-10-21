@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
 import { addSpouse } from "@/lib/action/create-spouse"; // The addSpouse function we created earlier
-import { useSession } from "next-auth/react";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { signIn, useSession } from "next-auth/react";
 import { getCreator } from "@/lib/action/get-creator";
 
 const AddSpouseForm = () => {
@@ -22,10 +21,12 @@ const AddSpouseForm = () => {
   const { data, status } = useSession();
   const [creatorId, setCreatorId] = useState(null);
 
-  if (status === "unauthenticated") {
-    alert("Please login to continue");
-    signIn();
-  }
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      alert("Please login to continue");
+      signIn();
+    }
+  }, [status]);
 
   async function fetchCreator() {
     const creatorId = await getCreator(params.familyId);

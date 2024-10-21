@@ -22,10 +22,12 @@ const AddChildPage = () => {
   const { data, status } = useSession();
   const [creatorId, setCreatorId] = useState(null);
 
-  if (status === "unauthenticated") {
-    alert("Please login to continue");
-    signIn();
-  }
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      alert("Please login to continue");
+      signIn();
+    }
+  }, [status]);
 
   async function fetchCreator() {
     const creatorId = await getCreator(params.familyId);
