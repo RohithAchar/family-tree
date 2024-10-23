@@ -8,6 +8,8 @@ import CurvyLink from "./components/curvy-line";
 import { getFamilyMembers } from "@/lib/action/get-family";
 import { useParams, useRouter } from "next/navigation";
 import { getCreator } from "@/lib/action/get-creator";
+import { Info, Share2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function App() {
   const [treeData, setTreeData] = useState();
@@ -60,7 +62,20 @@ export default function App() {
 
   return (
     <>
-      <div>Hello</div>
+      <div className="absolute top-[35%] right-4 p-2 flex flex-col gap-2">
+        <button
+          className="p-2 rounded-lg bg-[#f3f4f6]"
+          onClick={() => {
+            navigator.clipboard.writeText(window.location.href);
+            toast.success("Copied to clipboard");
+          }}
+        >
+          <Share2 />
+        </button>
+        <button className="p-2 rounded-lg bg-[#f3f4f6]">
+          <Info />
+        </button>
+      </div>
       <FamilyTree data={treeData} />
     </>
   );
