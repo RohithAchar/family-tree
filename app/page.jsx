@@ -65,7 +65,7 @@ export default function Component() {
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
                   <Button
                     size="lg"
-                    onClick={() => (window.location.href = "/home")}
+                    onClick={() => (window.location.href = "/new")}
                   >
                     Get Started
                   </Button>

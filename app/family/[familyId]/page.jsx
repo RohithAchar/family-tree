@@ -6,17 +6,17 @@ import Tree from "react-d3-tree";
 import CustomNode from "./components/custome-node";
 import CurvyLink from "./components/curvy-line";
 import { getFamilyMembers } from "@/lib/action/get-family";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { getCreator } from "@/lib/action/get-creator";
 import { Info, Share2 } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function App() {
-  const [treeData, setTreeData] = useState();
+  const [treeData, setTreeData] = useState(null);
   const [isMounted, setIsMounted] = useState(false);
-  const [creator, setCreator] = useState(null);
   const [error, setError] = useState(null);
   const params = useParams();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -26,17 +26,26 @@ export default function App() {
     const fetchFamilyMembers = async () => {
       const familyId = params.familyId; // Replace with your actual family ID
       try {
+        setLoading(true);
         const data = await getFamilyMembers(familyId);
-        const creatorId = await getCreator(familyId);
-        setCreator(creatorId);
         setTreeData(data);
       } catch (err) {
         setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchFamilyMembers();
   }, []);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
 
   const FamilyTree = ({ data }) => {
     return (
@@ -57,8 +66,10 @@ export default function App() {
   if (!isMounted) return null;
 
   if (!treeData) {
-    return <button onClick={() => handleAddChild()}>Add Root</button>;
+    return;
   }
+
+  console.log(treeData);
 
   return (
     <>
