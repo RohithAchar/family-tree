@@ -33,18 +33,15 @@ const AddChildPage = () => {
     }
   }, [status]);
 
-  async function fetchCreator() {
-    const creatorId = await getCreator(params.familyId);
-    setCreatorId(creatorId);
-  }
-
   useEffect(() => {
+    const fetchCreator = async () => {
+      const creatorId = await getCreator(params.familyId);
+      setCreatorId(creatorId);
+    };
     fetchCreator();
-  }, [status]);
+  }, [status, params.familyId]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const handleSubmit = async () => {
     try {
       const parentId = params.parentId;
       const newChild = await createChild(parentId, formData);
@@ -61,12 +58,17 @@ const AddChildPage = () => {
     }));
   };
 
-  useEffect(() => {
-    if (data && data.user.email !== creatorId) {
-      alert("Unauthorized");
-      router.push(`/family/${params.familyId}`);
-    }
-  }, [creatorId]);
+  // useEffect(() => {
+  //   if (data && data.user.email !== creatorId) {
+  //     alert("Unauthorized");
+  //     router.push(`/family/${params.familyId}`);
+  //   }
+  // }, []);
+
+  if (data && data.user.email !== creatorId) {
+    alert("Unauthorized");
+    router.push(`/family/${params.familyId}`);
+  }
 
   return (
     <>

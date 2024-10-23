@@ -31,21 +31,24 @@ const AddSpouseForm = () => {
     }
   }, [status]);
 
-  async function fetchCreator() {
-    const creatorId = await getCreator(params.familyId);
-    setCreatorId(creatorId);
-  }
-
   useEffect(() => {
-    fetchCreator();
-  }, [status]);
-
-  useEffect(() => {
-    if (data && data.user.email !== creatorId) {
-      alert("Unauthorized");
-      router.push(`/family/${params.familyId}`);
+    async function fetchCreator() {
+      const creatorId = await getCreator(params.familyId);
+      setCreatorId(creatorId);
     }
-  }, [creatorId]);
+    fetchCreator();
+  }, [status, params.familyId]);
+
+  // useEffect(() => {
+  //   if (data && data.user.email !== creatorId) {
+  //     alert("Unauthorized");
+  //     router.push(`/family/${params.familyId}`);
+  //   }
+  // }, [creatorId]);
+  if (data && data.user.email !== creatorId) {
+    alert("Unauthorized");
+    router.push(`/family/${params.familyId}`);
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();

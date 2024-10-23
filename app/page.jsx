@@ -118,22 +118,22 @@ export default function Component() {
             <div className="grid gap-6 lg:grid-cols-3">
               <div className="flex flex-col gap-2 p-6 bg-background rounded-lg shadow">
                 <p className="text-sm text-muted-foreground">
-                  "FamilyRoot helped me discover relatives I never knew I had.
-                  It's been an incredible journey!"
+                  &quot;FamilyRoot helped me discover relatives I never knew I
+                  had. It&apos;s been an incredible journey!&quot;
                 </p>
                 <p className="font-semibold">- Sarah Johnson</p>
               </div>
               <div className="flex flex-col gap-2 p-6 bg-background rounded-lg shadow">
                 <p className="text-sm text-muted-foreground">
-                  "The interface is so intuitive. I was able to build my family
-                  tree in no time!"
+                  &quot;The interface is so intuitive. I was able to build my
+                  family tree in no time!&quot;
                 </p>
                 <p className="font-semibold">- Michael Chen</p>
               </div>
               <div className="flex flex-col gap-2 p-6 bg-background rounded-lg shadow">
                 <p className="text-sm text-muted-foreground">
-                  "I love how easy it is to collaborate with my family members
-                  on our shared history."
+                  &quot;I love how easy it is to collaborate with my family
+                  members on our shared history.&quot;
                 </p>
                 <p className="font-semibold">- Emily Rodriguez</p>
               </div>

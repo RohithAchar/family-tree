@@ -37,7 +37,7 @@ export default function App() {
     };
 
     fetchFamilyMembers();
-  }, []);
+  }, [params.familyId]);
 
   if (loading) {
     return <p>Loading...</p>;
