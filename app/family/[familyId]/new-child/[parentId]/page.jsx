@@ -58,17 +58,17 @@ const AddChildPage = () => {
     }));
   };
 
-  // useEffect(() => {
-  //   if (data && data.user.email !== creatorId) {
-  //     alert("Unauthorized");
-  //     router.push(`/family/${params.familyId}`);
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (data && data.user.email !== creatorId) {
+      alert("Unauthorized");
+      router.push(`/family/${params.familyId}`);
+    }
+  }, [creatorId]);
 
-  if (data && data.user.email !== creatorId) {
-    alert("Unauthorized");
-    router.push(`/family/${params.familyId}`);
-  }
+  // if (data && data.user.email !== creatorId) {
+  //   alert("Unauthorized");
+  //   router.push(`/family/${params.familyId}`);
+  // }
 
   return (
     <>
