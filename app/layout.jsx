@@ -3,6 +3,7 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import ToastProvider from "@/lib/provider/toast-provider";
 import { Analytics } from "@vercel/analytics/react";
+import GoogleAdSense from "@/components/ui/google-adsense";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -29,6 +30,7 @@ export default function RootLayout({ children }) {
         {children}
         <Analytics />
       </body>
+      <GoogleAdSense pId="2542301015759236" />
     </html>
   );
 }
