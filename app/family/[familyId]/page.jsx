@@ -34,9 +34,7 @@ export default function App() {
         );
         setIsAuthorized(true);
         router.refresh();
-      } catch (error) {
-        toast.error(error.message);
-      }
+      } catch (error) {}
     };
 
     verify();
