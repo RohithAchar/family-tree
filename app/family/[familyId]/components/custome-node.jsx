@@ -132,6 +132,9 @@ const CustomNode = ({ nodeDatum, toggleNode }) => {
                 : "#FDE9F9"
             }
             filter="url(#shadow)" // Apply the shadow filter here
+            onClick={() => {
+              handleNodeClick(nodeDatum.spouse.id);
+            }}
           />
           <text
             className="semi-bold"

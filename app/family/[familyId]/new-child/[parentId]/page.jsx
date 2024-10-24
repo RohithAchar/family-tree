@@ -1,13 +1,8 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-
 import { createChild } from "@/lib/action/create-child";
-// pages/addChild.js
-
 import { useEffect, useState } from "react";
-import { signIn, useSession } from "next-auth/react";
-import { getCreator } from "@/lib/action/get-creator";
 import toast from "react-hot-toast";
 import { CldUploadWidget } from "next-cloudinary";
 import Image from "next/image";
@@ -21,31 +16,29 @@ const AddChildPage = () => {
     url: "",
   });
   const [message, setMessage] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
   const params = useParams();
   const router = useRouter();
-  const { data, status } = useSession();
-  const [creatorId, setCreatorId] = useState(null);
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      alert("Please login to continue");
-      signIn();
-    }
-  }, [status]);
-
-  useEffect(() => {
-    const fetchCreator = async () => {
-      const creatorId = await getCreator(params.familyId);
-      setCreatorId(creatorId);
-    };
-    fetchCreator();
-  }, [status, params.familyId]);
+    setIsMounted(true);
+  }, []);
 
   const handleSubmit = async () => {
     try {
       const parentId = params.parentId;
-      const newChild = await createChild(parentId, formData);
-      toast.success(`Child ${newChild.name} created successfully!`);
+      const res = await createChild(
+        parentId,
+        formData,
+        Number(localStorage.getItem("key")),
+        params.familyId
+      );
+      if (res.status === 401) {
+        toast.error("Unauthorized");
+        window.location.href = "/family/" + params.familyId;
+        return;
+      }
+      toast.success(`Child created successfully!`);
       router.push(`/family/${params.familyId}`);
     } catch (error) {
       setMessage("Error creating child: " + error.message);
@@ -58,17 +51,12 @@ const AddChildPage = () => {
     }));
   };
 
-  useEffect(() => {
-    if (data && data.user.email !== creatorId) {
-      alert("Unauthorized");
-      router.push(`/family/${params.familyId}`);
-    }
-  }, [creatorId]);
-
-  // if (data && data.user.email !== creatorId) {
-  //   alert("Unauthorized");
-  //   router.push(`/family/${params.familyId}`);
-  // }
+  if (!isMounted) {
+    return null;
+  }
+  if (localStorage.getItem("key") == null) {
+    window.location.href = "/family/" + params.familyId;
+  }
 
   return (
     <>

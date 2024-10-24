@@ -1,18 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createNewFamily } from "@/lib/action/create-family";
-import { signIn, useSession } from "next-auth/react";
-import { authOptions } from "../api/auth/[...nextauth]/route";
 import { CldUploadWidget } from "next-cloudinary";
 import Image from "next/image";
 import toast from "react-hot-toast";
 
 const CreateFamilyPage = () => {
-  const { data, status } = useSession(authOptions);
   const [formData, setFormData] = useState({
     familyName: "",
+    key: "",
     rootPerson: {
       name: "",
       gender: "male", // Default value for gender
@@ -24,20 +22,12 @@ const CreateFamilyPage = () => {
   const [message, setMessage] = useState("");
   const router = useRouter();
 
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      signIn();
-    }
-  }, [status]);
-
   const handleSubmit = async () => {
-    const creatorId = data.user.email;
-
     try {
       const newFamily = await createNewFamily(
         formData.familyName,
         formData.rootPerson,
-        creatorId
+        Number(formData.key)
       );
       setMessage(
         `Family '${newFamily.name}' created successfully with root person '${newFamily.root.name}'!`
@@ -45,6 +35,7 @@ const CreateFamilyPage = () => {
       toast.success(
         `Family '${newFamily.name}' created successfully with root person '${newFamily.root.name}'!`
       );
+      localStorage.setItem("key", formData.key);
       router.push(`family/${newFamily.id}`);
     } catch (error) {
       setMessage("Error creating family: " + error.message);
@@ -76,6 +67,19 @@ const CreateFamilyPage = () => {
               value={formData.familyName}
               onChange={(e) =>
                 setFormData({ ...formData, familyName: e.target.value })
+              }
+              required
+            />
+          </div>
+          <div>
+            <label>Key</label>
+            <input
+              type="number"
+              className="border rounded-lg p-2 w-full"
+              placeholder="1234"
+              value={formData.key}
+              onChange={(e) =>
+                setFormData({ ...formData, key: e.target.value })
               }
               required
             />

@@ -5,16 +5,13 @@ import { getPerson } from "@/lib/action/get-person";
 import { useParams, useRouter } from "next/navigation";
 import { updatePerson } from "@/lib/action/update-person";
 import { deletePerson } from "@/lib/action/delete-person";
-import { useSession } from "next-auth/react";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { getCreator } from "@/lib/action/get-creator";
 import { CldUploadWidget } from "next-cloudinary";
 import Image from "next/image";
 import { Trash } from "lucide-react";
+import { extractFirstUUID } from "@/lib/utils";
+import toast from "react-hot-toast";
 
 export default function UpdatePersonForm() {
-  const { data, status } = useSession(authOptions);
-  const [creatorId, setCreatorId] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     gender: "",
@@ -24,32 +21,21 @@ export default function UpdatePersonForm() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isMounted, setIsMounted] = useState(false);
   const params = useParams();
-  const router = useRouter();
-
-  function extractFirstUUID(url) {
-    const pattern =
-      /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/;
-    const match = url.match(pattern);
-    return match ? match[0] : null;
-  }
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      signIn();
-    }
-  }, [status]);
+    setIsMounted(true);
+  }, []);
 
   // Fetch the person's data on component mount
   useEffect(() => {
     async function fetchPerson() {
       try {
         const person = await getPerson(params.personId);
-        console.log(person);
         //
         const url = window.location.href;
         const firstUUID = extractFirstUUID(url);
-        const res = await getCreator(firstUUID);
         //
         setFormData({
           name: person.name,
@@ -58,7 +44,6 @@ export default function UpdatePersonForm() {
           alive: person.alive,
           url: person.url,
         });
-        setCreatorId(res);
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -70,13 +55,23 @@ export default function UpdatePersonForm() {
   }, [params.personId]);
 
   // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     try {
-      await updatePerson(params.personId, formData);
-      alert("Person updated successfully!");
-      router.back();
+      const data = await updatePerson(
+        params.personId,
+        formData,
+        Number(localStorage.getItem("key")),
+        params.familyId
+      );
+      if (data.status === 401) {
+        toast.error("Unauthorized");
+        window.location.href = "/family/" + params.familyId;
+        return;
+      }
+      toast.success("Person updated successfully!");
+      window.location.href = `/family/${params.familyId}`;
     } catch (error) {
+      toast.error("Failed to update person: ");
       console.error("Failed to update person:", error);
       setError("Failed to update person.");
     }
@@ -86,11 +81,26 @@ export default function UpdatePersonForm() {
     if (!confirmed) return;
 
     try {
-      await deletePerson(params.personId);
-      alert("Person deleted successfully!");
+      const res = await deletePerson(
+        params.personId,
+        Number(localStorage.getItem("key")),
+        params.familyId
+      );
+      if (res.status === 401) {
+        toast.error("Unauthorized");
+        window.location.href = "/family/" + params.familyId;
+        return;
+      }
+      if (res.status === 400) {
+        toast.error("Cannot delete root person");
+        window.location.href = "/family/" + params.familyId;
+        return;
+      }
+      toast.success("Person deleted successfully!");
       // Optionally, redirect or refresh after deletion
-      router.back();
+      window.location.href = `/family/${params.familyId}`;
     } catch (error) {
+      toast.error("Failed to delete person");
       console.error("Failed to delete person:", error.data.user.email);
       setError("Failed to delete person.");
     }
@@ -102,13 +112,17 @@ export default function UpdatePersonForm() {
     }));
   };
 
+  if (!isMounted) {
+    return null;
+  }
   if (loading) {
     return <p>Loading....</p>;
   }
-  if (error) return <div>Error: {error}</div>;
-  if (data.user && data.user.email !== creatorId) {
-    alert("Unauthorized");
-    router.back();
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+  if (localStorage.getItem("key") == null) {
+    window.location.href = "/family/" + params.familyId;
   }
 
   return (
@@ -232,12 +246,22 @@ export default function UpdatePersonForm() {
                 }
               />
             </div>
-            <button
-              className="border rounded-lg p-2 w-full bg-black text-white"
-              onClick={handleSubmit}
-            >
-              Update Person
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  window.location.href = `/family/${params.familyId}`;
+                }}
+                className="border rounded-lg p-2 w-full"
+              >
+                Cancel
+              </button>
+              <button
+                className="border rounded-lg p-2 w-full bg-black text-white"
+                onClick={handleSubmit}
+              >
+                Update Person
+              </button>
+            </div>
           </div>
         </div>
       </div>

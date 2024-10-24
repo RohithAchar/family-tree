@@ -10,7 +10,7 @@ generator client {
 model Family {
   id       String  @id @default(uuid())
   name     String
-  creatorId  String   // Use String to store external userId
+  key      Int
   rootId   String  @unique
   root     Person  @relation("FamilyRoot", fields: [rootId], references: [id])
   members  Person[]

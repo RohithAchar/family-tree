@@ -3,11 +3,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
-import { addSpouse } from "@/lib/action/create-spouse"; // The addSpouse function we created earlier
-import { signIn, useSession } from "next-auth/react";
-import { getCreator } from "@/lib/action/get-creator";
+import { addSpouse } from "@/lib/action/create-spouse";
 import { CldUploadWidget } from "next-cloudinary";
 import Image from "next/image";
+import toast from "react-hot-toast";
 
 const AddSpouseForm = () => {
   const [spouseData, setSpouseData] = useState({
@@ -19,44 +18,29 @@ const AddSpouseForm = () => {
     url: "",
   });
   const [message, setMessage] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
   const params = useParams();
   const router = useRouter();
-  const { data, status } = useSession();
-  const [creatorId, setCreatorId] = useState(null);
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      alert("Please login to continue");
-      signIn();
-    }
-  }, [status]);
+    setIsMounted(true);
+  }, []);
 
-  useEffect(() => {
-    async function fetchCreator() {
-      const creatorId = await getCreator(params.familyId);
-      setCreatorId(creatorId);
-    }
-    fetchCreator();
-  }, [status, params.familyId]);
-
-  useEffect(() => {
-    if (data && data.user.email !== creatorId) {
-      alert("Unauthorized");
-      router.push(`/family/${params.familyId}`);
-    }
-  }, [creatorId]);
-  // if (data && data.user.email !== creatorId) {
-  //   alert("Unauthorized");
-  //   router.push(`/family/${params.familyId}`);
-  // }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const handleSubmit = async () => {
     try {
       const personId = params.spouseId;
-      console.log("personId: " + personId);
-      const result = await addSpouse(personId, spouseData);
+      const res = await addSpouse(
+        personId,
+        spouseData,
+        Number(localStorage.getItem("key")),
+        params.familyId
+      );
+      if (res.status === 401) {
+        toast.error("Unauthorized");
+        window.location.href = "/family/" + params.familyId;
+        return;
+      }
+      toast.success("Spouse added successfully!");
       setMessage(`Spouse added successfully!`);
       router.push(`/family/${params.familyId}`);
     } catch (error) {
@@ -69,6 +53,13 @@ const AddSpouseForm = () => {
       url: e.info.secure_url,
     }));
   };
+
+  if (!isMounted) {
+    return null;
+  }
+  if (localStorage.getItem("key") == null) {
+    window.location.href = "/family/" + params.familyId;
+  }
 
   return (
     <>

@@ -1,6 +1,5 @@
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import Provider from "@/lib/provider/session-provider";
 import { Toaster } from "react-hot-toast";
 
 const poppins = Poppins({
@@ -17,10 +16,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${poppins.className}`}>
-        <Provider>
-          <Toaster />
-          {children}
-        </Provider>
+        <Toaster />
+        {children}
       </body>
     </html>
   );

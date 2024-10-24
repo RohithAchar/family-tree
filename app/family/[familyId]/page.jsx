@@ -6,10 +6,12 @@ import Tree from "react-d3-tree";
 import CustomNode from "./components/custome-node";
 import CurvyLink from "./components/curvy-line";
 import { getFamilyMembers } from "@/lib/action/get-family";
-import { useParams } from "next/navigation";
-import { getCreator } from "@/lib/action/get-creator";
+import { useParams, useRouter } from "next/navigation";
 import { Info, Share2 } from "lucide-react";
 import toast from "react-hot-toast";
+import KeyModal from "@/components/ui/key-modal";
+import { extractFirstUUID } from "@/lib/utils";
+import verifyUser from "@/lib/action/verify-user";
 
 export default function App() {
   const [treeData, setTreeData] = useState(null);
@@ -17,9 +19,27 @@ export default function App() {
   const [error, setError] = useState(null);
   const params = useParams();
   const [loading, setLoading] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setIsMounted(true);
+    const url = window.location.href;
+    const firstUUID = extractFirstUUID(url);
+    const verify = async () => {
+      try {
+        const family = await verifyUser(
+          Number(localStorage.getItem("key")),
+          firstUUID
+        );
+        setIsAuthorized(true);
+        router.refresh();
+      } catch (error) {
+        toast.error(error.message);
+      }
+    };
+
+    verify();
   }, []);
 
   useEffect(() => {
@@ -39,8 +59,14 @@ export default function App() {
     fetchFamilyMembers();
   }, [params.familyId]);
 
+  if (!isMounted) return null;
+
   if (loading) {
     return <p>Loading...</p>;
+  }
+
+  if (localStorage.getItem("key") == null || !isAuthorized) {
+    return <KeyModal />;
   }
 
   if (error) {
@@ -68,8 +94,6 @@ export default function App() {
   if (!treeData) {
     return;
   }
-
-  console.log(treeData);
 
   return (
     <>
