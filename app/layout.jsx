@@ -1,6 +1,8 @@
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
+import ToastProvider from "@/lib/provider/toast-provider";
+import { Analytics } from "@vercel/analytics/react";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -15,9 +17,17 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2542301015759236"
+          crossOrigin="anonymous"
+        ></script>
+      </head>
       <body className={`${poppins.className}`}>
-        <Toaster />
+        <ToastProvider />
         {children}
+        <Analytics />
       </body>
     </html>
   );
