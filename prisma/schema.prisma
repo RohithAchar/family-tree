@@ -23,7 +23,7 @@ model Person {
   dob        DateTime
   alive      Boolean
   url        String
-  phoneNumber Int
+  phoneNumber Int   @default(0)
   
   // Self-referential relationships
   parentId   String?
