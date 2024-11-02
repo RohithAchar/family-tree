@@ -1,13 +1,17 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
-import { createChild } from "@/lib/action/create-child";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import { useState, useEffect } from "react";
+import { getPerson } from "@/lib/action/get-person";
+import { useParams } from "next/navigation";
+import { updatePerson } from "@/lib/action/update-person";
+import { deletePerson } from "@/lib/action/delete-person";
 import { CldUploadWidget } from "next-cloudinary";
 import Image from "next/image";
+import { Trash } from "lucide-react";
+import { extractFirstUUID } from "@/lib/utils";
+import toast from "react-hot-toast";
 
-const AddChildPage = () => {
+export default function UpdatePersonForm() {
   const [formData, setFormData] = useState({
     name: "",
     gender: "",
@@ -16,21 +20,71 @@ const AddChildPage = () => {
     url: "",
     phoneNumber: "",
   });
-  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [isMounted, setIsMounted] = useState(false);
   const params = useParams();
-  const router = useRouter();
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
+  // Fetch the person's data on component mount
+  useEffect(() => {
+    async function fetchPerson() {
+      try {
+        const person = await getPerson(params.personId);
+        //
+        const url = window.location.href;
+        const firstUUID = extractFirstUUID(url);
+        //
+        setFormData({
+          name: person.name,
+          gender: person.gender,
+          dob: person.dob,
+          alive: person.alive,
+          url: person.url,
+          phoneNumber: person.phoneNumber,
+        });
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    }
+
+    fetchPerson();
+  }, [params.personId]);
+
+  // Handle form submission
   const handleSubmit = async () => {
     try {
-      const parentId = params.parentId;
-      const res = await createChild(
-        parentId,
+      const data = await updatePerson(
+        params.personId,
         formData,
+        Number(localStorage.getItem("key")),
+        params.familyId
+      );
+      if (data.status === 401) {
+        toast.error("Unauthorized");
+        window.location.href = "/family/" + params.familyId;
+        return;
+      }
+      toast.success("Person updated successfully!");
+      window.location.href = `/family/${params.familyId}`;
+    } catch (error) {
+      toast.error("Failed to update person: ");
+      console.error("Failed to update person:", error);
+      setError("Failed to update person.");
+    }
+  };
+  const handleDelete = async () => {
+    const confirmed = confirm("Are you sure you want to delete this person?");
+    if (!confirmed) return;
+
+    try {
+      const res = await deletePerson(
+        params.personId,
         Number(localStorage.getItem("key")),
         params.familyId
       );
@@ -39,10 +93,17 @@ const AddChildPage = () => {
         window.location.href = "/family/" + params.familyId;
         return;
       }
-      toast.success(`Child created successfully!`);
-      router.push(`/family/${params.familyId}`);
+      if (res.status === 400) {
+        toast.error("Cannot delete root person");
+        window.location.href = "/family/" + params.familyId;
+        return;
+      }
+      toast.success("Person deleted successfully!");
+      window.location.href = `/family/${params.familyId}`;
     } catch (error) {
-      setMessage("Error creating child: " + error.message);
+      toast.error("Failed to delete person");
+      console.error("Failed to delete person:", error.data.user.email);
+      setError("Failed to delete person.");
     }
   };
   const onUpload = (e) => {
@@ -55,6 +116,12 @@ const AddChildPage = () => {
   if (!isMounted) {
     return null;
   }
+  if (loading) {
+    return <p>Loading....</p>;
+  }
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
   if (localStorage.getItem("key") == null) {
     window.location.href = "/family/" + params.familyId;
   }
@@ -63,17 +130,25 @@ const AddChildPage = () => {
     <>
       <div className="flex h-screen items-center justify-center">
         <div className="w-[350px] border px-4 py-6 flex flex-col gap-6 shadow-lg rounded-lg">
-          <div>
-            <h3 className="text-xl font-bold">Add child</h3>
-            <p className="text-muted-foreground">Hello</p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h3 className="text-xl font-bold">Edit member</h3>
+              <p className="text-muted-foreground">Hello</p>
+            </div>
+            <button
+              className="border p-2 rounded-lg bg-red-500 text-white"
+              type="button"
+              onClick={handleDelete}
+            >
+              <Trash />
+            </button>
           </div>
           <div className="w-full border" />
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
             <div>
               <label>Name</label>
               <input
                 className="border p-2 rounded-lg w-full"
-                placeholder="Enter name"
                 type="text"
                 value={formData.name}
                 onChange={(e) =>
@@ -86,7 +161,6 @@ const AddChildPage = () => {
               <label>Phone number</label>
               <input
                 className="border p-2 rounded-lg w-full"
-                placeholder="Enter phone number"
                 type="tel"
                 value={formData.phoneNumber}
                 onChange={(e) =>
@@ -138,7 +212,7 @@ const AddChildPage = () => {
               }}
             </CldUploadWidget>
             <div>
-              <label>Gender</label>
+              <label>Gender:</label>
               <div>
                 <input
                   type="radio"
@@ -150,12 +224,9 @@ const AddChildPage = () => {
                     setFormData({ ...formData, gender: e.target.value })
                   }
                 />
-                <label className="ml-2" htmlFor="male">
-                  Male
-                </label>
-              </div>
-              <div>
+                <label htmlFor="male">Male</label>
                 <input
+                  className="ml-2"
                   type="radio"
                   id="female"
                   name="gender"
@@ -165,13 +236,11 @@ const AddChildPage = () => {
                     setFormData({ ...formData, gender: e.target.value })
                   }
                 />
-                <label className="ml-2" htmlFor="female">
-                  Female
-                </label>
+                <label htmlFor="female">Female</label>
               </div>
             </div>
             <div>
-              <label>Date of Birth</label>
+              <label>Date of Birth:</label>
               <input
                 className="block border p-2 rounded-lg w-full"
                 type="date"
@@ -182,8 +251,8 @@ const AddChildPage = () => {
                 required
               />
             </div>
-            <div className="flex items-center">
-              <label>Alive</label>
+            <div className="flex">
+              <label>Alive:</label>
               <input
                 className="ml-2"
                 type="checkbox"
@@ -193,17 +262,25 @@ const AddChildPage = () => {
                 }
               />
             </div>
-            <button
-              className="p-2 bg-black text-white rounded-lg"
-              onClick={handleSubmit}
-            >
-              Add Child
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  window.location.href = `/family/${params.familyId}`;
+                }}
+                className="border rounded-lg p-2 w-full"
+              >
+                Cancel
+              </button>
+              <button
+                className="border rounded-lg p-2 w-full bg-black text-white"
+                onClick={handleSubmit}
+              >
+                Update Person
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </>
   );
-};
-
-export default AddChildPage;
+}

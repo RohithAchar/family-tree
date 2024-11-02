@@ -16,6 +16,7 @@ const AddSpouseForm = () => {
     alive: true,
     familyId: "", // Optional if needed
     url: "",
+    phoneNumber: "",
   });
   const [message, setMessage] = useState("");
   const [isMounted, setIsMounted] = useState(false);
@@ -80,6 +81,19 @@ const AddSpouseForm = () => {
                 value={spouseData.name}
                 onChange={(e) =>
                   setSpouseData({ ...spouseData, name: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div>
+              <label>Phone number</label>
+              <input
+                className="border p-2 rounded-lg w-full"
+                placeholder="Enter phone number"
+                type="tel"
+                value={spouseData.phoneNumber}
+                onChange={(e) =>
+                  setSpouseData({ ...spouseData, phoneNumber: e.target.value })
                 }
                 required
               />

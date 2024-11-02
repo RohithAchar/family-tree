@@ -17,6 +17,7 @@ const CreateFamilyPage = () => {
       dob: "",
       alive: true,
       url: "",
+      phoneNumber: "",
     },
   });
   const [message, setMessage] = useState("");
@@ -98,6 +99,25 @@ const CreateFamilyPage = () => {
                   rootPerson: {
                     ...formData.rootPerson,
                     name: e.target.value,
+                  },
+                })
+              }
+              required
+            />
+          </div>
+          <div>
+            <label>Phone number</label>
+            <input
+              type="tel"
+              className="border rounded-lg p-2 w-full"
+              placeholder="Enter root member phone number"
+              value={formData.rootPerson.phoneNumber}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  rootPerson: {
+                    ...formData.rootPerson,
+                    phoneNumber: Number(e.target.value),
                   },
                 })
               }
