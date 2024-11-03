@@ -46,6 +46,7 @@ const AddSpouseForm = () => {
       router.push(`/family/${params.familyId}`);
     } catch (error) {
       setMessage(`Error adding spouse: ${error.message}`);
+      toast.error("Error adding spouse: " + error.message);
     }
   };
   const onUpload = (e) => {
@@ -68,7 +69,9 @@ const AddSpouseForm = () => {
         <div className="w-[350px] border px-4 py-6 flex flex-col gap-6 shadow-lg rounded-lg">
           <div>
             <h3 className="text-xl font-bold">Add spouse</h3>
-            <p className="text-muted-foreground">Hello</p>
+            <p className="text-muted-foreground">
+              Enter details to add a spouse to this family member.
+            </p>
           </div>
           <div className="w-full border" />
           <div className="flex flex-col gap-2">

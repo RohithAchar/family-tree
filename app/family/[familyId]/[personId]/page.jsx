@@ -5,6 +5,7 @@ import { getPerson } from "@/lib/action/get-person";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { extractFirstUUID } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 
 export default function UpdatePersonForm() {
   const [formData, setFormData] = useState({
@@ -56,7 +57,11 @@ export default function UpdatePersonForm() {
     return null;
   }
   if (loading) {
-    return <p>Loading....</p>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="animate-spin text-2xl text-blue-500 mr-2" />
+      </div>
+    );
   }
   if (error) {
     return <div>Error: {error}</div>;

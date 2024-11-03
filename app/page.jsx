@@ -80,8 +80,12 @@ export default function Component() {
                   >
                     Get Started
                   </Button>
-                  <Button size="lg" variant="outline">
-                    Learn More
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    onClick={() => (window.location.href = "/search")}
+                  >
+                    Search family
                   </Button>
                 </div>
               </div>

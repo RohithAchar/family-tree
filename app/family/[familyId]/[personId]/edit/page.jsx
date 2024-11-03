@@ -7,7 +7,7 @@ import { updatePerson } from "@/lib/action/update-person";
 import { deletePerson } from "@/lib/action/delete-person";
 import { CldUploadWidget } from "next-cloudinary";
 import Image from "next/image";
-import { Trash } from "lucide-react";
+import { Loader2, Trash } from "lucide-react";
 import { extractFirstUUID } from "@/lib/utils";
 import toast from "react-hot-toast";
 
@@ -21,6 +21,7 @@ export default function UpdatePersonForm() {
     phoneNumber: "",
   });
   const [loading, setLoading] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState(null);
   const [isMounted, setIsMounted] = useState(false);
   const params = useParams();
@@ -59,6 +60,7 @@ export default function UpdatePersonForm() {
   // Handle form submission
   const handleSubmit = async () => {
     try {
+      setIsUploading(true);
       const data = await updatePerson(
         params.personId,
         formData,
@@ -76,6 +78,8 @@ export default function UpdatePersonForm() {
       toast.error("Failed to update person: ");
       console.error("Failed to update person:", error);
       setError("Failed to update person.");
+    } finally {
+      setIsUploading(false);
     }
   };
   const handleDelete = async () => {
@@ -117,7 +121,11 @@ export default function UpdatePersonForm() {
     return null;
   }
   if (loading) {
-    return <p>Loading....</p>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="animate-spin text-2xl text-blue-500 mr-2" />
+      </div>
+    );
   }
   if (error) {
     return <div>Error: {error}</div>;
@@ -132,8 +140,12 @@ export default function UpdatePersonForm() {
         <div className="w-[350px] border px-4 py-6 flex flex-col gap-6 shadow-lg rounded-lg">
           <div className="flex justify-between items-center">
             <div>
-              <h3 className="text-xl font-bold">Edit member</h3>
-              <p className="text-muted-foreground">Hello</p>
+              <h3 className="text-xl font-bold">
+                Update Family Member Details
+              </h3>
+              <p className="text-muted-foreground">
+                Modify information or add new details for this family member.
+              </p>
             </div>
             <button
               className="border p-2 rounded-lg bg-red-500 text-white"
@@ -274,8 +286,15 @@ export default function UpdatePersonForm() {
               <button
                 className="border rounded-lg p-2 w-full bg-black text-white"
                 onClick={handleSubmit}
+                disabled={isUploading}
               >
-                Update Person
+                {isUploading ? (
+                  <div className="flex justify-center">
+                    <Loader2 className="animate-spin text-2xl" />
+                  </div>
+                ) : (
+                  "Update Person"
+                )}
               </button>
             </div>
           </div>

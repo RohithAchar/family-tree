@@ -7,11 +7,12 @@ import CustomNode from "./components/custome-node";
 import CurvyLink from "./components/curvy-line";
 import { getFamilyMembers } from "@/lib/action/get-family";
 import { useParams, useRouter } from "next/navigation";
-import { Info, Share2 } from "lucide-react";
+import { Info, Loader2, Share2 } from "lucide-react";
 import toast from "react-hot-toast";
 import KeyModal from "@/components/ui/key-modal";
 import { extractFirstUUID } from "@/lib/utils";
 import verifyUser from "@/lib/action/verify-user";
+import Modal from "./components/modal";
 
 export default function App() {
   const [treeData, setTreeData] = useState(null);
@@ -20,6 +21,7 @@ export default function App() {
   const params = useParams();
   const [loading, setLoading] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -60,7 +62,11 @@ export default function App() {
   if (!isMounted) return null;
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="animate-spin text-2xl text-blue-500 mr-2" />
+      </div>
+    );
   }
 
   if (localStorage.getItem("key") == null || !isAuthorized) {
@@ -93,6 +99,10 @@ export default function App() {
     return;
   }
 
+  if (isModalOpen) {
+    return <Modal isOpen={true} setIsOpen={setIsModalOpen} />;
+  }
+
   return (
     <>
       <div className="absolute top-[35%] right-4 p-2 flex flex-col gap-2">
@@ -105,7 +115,10 @@ export default function App() {
         >
           <Share2 />
         </button>
-        <button className="p-2 rounded-lg bg-[#f3f4f6]">
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="p-2 rounded-lg bg-[#f3f4f6]"
+        >
           <Info />
         </button>
       </div>

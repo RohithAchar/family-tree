@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createNewFamily } from "@/lib/action/create-family";
 import { CldUploadWidget } from "next-cloudinary";
 import Image from "next/image";
 import toast from "react-hot-toast";
+import { Loader2 } from "lucide-react";
 
 const CreateFamilyPage = () => {
   const [formData, setFormData] = useState({
@@ -21,25 +22,36 @@ const CreateFamilyPage = () => {
     },
   });
   const [message, setMessage] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null;
+  }
 
   const handleSubmit = async () => {
     try {
+      setLoading(true);
       const newFamily = await createNewFamily(
         formData.familyName,
         formData.rootPerson,
         Number(formData.key)
       );
-      setMessage(
-        `Family '${newFamily.name}' created successfully with root person '${newFamily.root.name}'!`
-      );
-      toast.success(
-        `Family '${newFamily.name}' created successfully with root person '${newFamily.root.name}'!`
-      );
+      await new Promise((resolve) => setInterval(resolve, 5000));
+      setMessage(`Family '${newFamily.name}' created successfully'!`);
+      toast.success(`Family '${newFamily.name}' created successfully'!`);
       localStorage.setItem("key", formData.key);
       router.push(`family/${newFamily.id}`);
     } catch (error) {
       setMessage("Error creating family: " + error.message);
+      toast.error("Please fill out the details");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -50,14 +62,25 @@ const CreateFamilyPage = () => {
     }));
   };
 
+  // if (loading) {
+  //   return (
+  //     <div className="flex items-center justify-center h-screen">
+  //       <Loader2 className="animate-spin text-2xl text-blue-500 mr-2" />
+  //     </div>
+  //   );
+  // }
+
   return (
     <div className="flex h-screen items-center justify-center">
       <div className="w-[350px] border px-4 py-6 flex flex-col gap-6 shadow-lg rounded-lg">
         <div>
-          <h3 className="text-xl font-bold">Create new family</h3>
-          <p className="text-muted-foreground">Hello</p>
+          <h3 className="text-xl font-bold">Create family tree</h3>
+          <p className="text-muted-foreground">
+            Visualize Your Ancestry and Explore Generations of Family
+            Connections.
+          </p>
         </div>
-        <div className="w-full border" />
+        {/* <div className="w-full border" /> */}
         <div className="flex flex-col gap-2">
           <div>
             <label>Family Name</label>
@@ -117,7 +140,7 @@ const CreateFamilyPage = () => {
                   ...formData,
                   rootPerson: {
                     ...formData.rootPerson,
-                    phoneNumber: Number(e.target.value),
+                    phoneNumber: e.target.value,
                   },
                 })
               }
@@ -239,8 +262,15 @@ const CreateFamilyPage = () => {
           <button
             className="w-full rounded-lg bg-black text-white p-2"
             onClick={handleSubmit}
+            disabled={loading}
           >
-            Create Family
+            {loading ? (
+              <div className="flex justify-center">
+                <Loader2 className="animate-spin text-2xl" />
+              </div>
+            ) : (
+              "Create"
+            )}
           </button>
         </div>
       </div>

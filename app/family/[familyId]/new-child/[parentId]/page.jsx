@@ -18,6 +18,7 @@ const AddChildPage = () => {
   });
   const [message, setMessage] = useState("");
   const [isMounted, setIsMounted] = useState(false);
+
   const params = useParams();
   const router = useRouter();
 
@@ -43,6 +44,7 @@ const AddChildPage = () => {
       router.push(`/family/${params.familyId}`);
     } catch (error) {
       setMessage("Error creating child: " + error.message);
+    } finally {
     }
   };
   const onUpload = (e) => {
@@ -65,7 +67,9 @@ const AddChildPage = () => {
         <div className="w-[350px] border px-4 py-6 flex flex-col gap-6 shadow-lg rounded-lg">
           <div>
             <h3 className="text-xl font-bold">Add child</h3>
-            <p className="text-muted-foreground">Hello</p>
+            <p className="text-muted-foreground">
+              Enter details to add a new child to the family tree.
+            </p>
           </div>
           <div className="w-full border" />
           <div className="flex flex-col gap-4">
@@ -92,7 +96,7 @@ const AddChildPage = () => {
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    phoneNumber: Number(e.target.value),
+                    phoneNumber: e.target.value,
                   })
                 }
                 required
